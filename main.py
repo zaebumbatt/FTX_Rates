@@ -50,7 +50,7 @@ def get_latest_rates():
 
 
 def create_message(coin, old_rate, new_rate):
-    return f"Coin: {coin}\nLast updated rate: {old_rate:.2f}\nEstimate new rate: {new_rate:.2f}"
+    return f"Coin: {coin}\nLast updated rate: {old_rate:.2f}\nNew estimated rate: {new_rate:.2f}"
 
 
 def send_message(message):
