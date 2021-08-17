@@ -56,3 +56,4 @@ if __name__ == "__main__":
     while True:
         if datetime.now().minute == 1:
             get_latest_rates()
+            time.sleep(61)
