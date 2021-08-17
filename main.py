@@ -1,6 +1,7 @@
 import hmac
 import os
 import time
+from datetime import datetime
 
 import telegram
 from dotenv import load_dotenv
@@ -27,31 +28,24 @@ prepared.headers['FTX-SIGN'] = signature
 prepared.headers['FTX-TS'] = str(ts)
 
 s = Session()
-
-old_rates = {
-    "USD": 0,
-    "USDT": 0
-}
+COINS = ("USD", "USDT", "BTC", "ETH")
 
 
 def get_latest_rates():
     response = s.send(prepared)
 
     if response.status_code == 200:
-        print(response.json()["result"])
+        rates = {}
         for result in response.json()["result"]:
             coin = result['coin']
-            if coin in old_rates:
-                new_rate = float(result['previous']) * 24 * 365 * 100
-                old_rate = old_rates.get(coin)
+            if coin in COINS:
+                rates[coin] = float(result['previous']) * 24 * 365 * 100
 
-                if abs(old_rate - new_rate) > 0.5:
-                    send_message(create_message(coin, old_rate, new_rate))
-                    old_rates[coin] = new_rate
-
-
-def create_message(coin, old_rate, new_rate):
-    return f"Coin: {coin}\nLast updated rate: {old_rate:.2f}\nRate for previous hour: {new_rate:.2f}"
+        message = [
+            f"Coin: {coin}\nRate for previous hour: {rate:.2f}\n\n"
+            for coin, rate in rates.items()
+        ]
+        send_message("".join(message))
 
 
 def send_message(message):
@@ -60,5 +54,5 @@ def send_message(message):
 
 if __name__ == "__main__":
     while True:
-        time.sleep(10)
-        get_latest_rates()
+        if datetime.now().minute == 1:
+            get_latest_rates()
