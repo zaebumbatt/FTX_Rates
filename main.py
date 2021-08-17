@@ -38,10 +38,11 @@ def get_latest_rates():
     response = s.send(prepared)
 
     if response.status_code == 200:
+        print(response.json()["result"])
         for result in response.json()["result"]:
             coin = result['coin']
             if coin in old_rates:
-                new_rate = float(result['estimate']) * 24 * 365 * 100
+                new_rate = float(result['previous']) * 24 * 365 * 100
                 old_rate = old_rates.get(coin)
 
                 if abs(old_rate - new_rate) > 0.5:
@@ -50,7 +51,7 @@ def get_latest_rates():
 
 
 def create_message(coin, old_rate, new_rate):
-    return f"Coin: {coin}\nLast updated rate: {old_rate:.2f}\nNew estimated rate: {new_rate:.2f}"
+    return f"Coin: {coin}\nLast updated rate: {old_rate:.2f}\nRate for previous hour: {new_rate:.2f}"
 
 
 def send_message(message):
